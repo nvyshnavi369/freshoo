@@ -6,7 +6,7 @@ import 'items.dart';
 import 'additems.dart';
 
 void main() => runApp(MaterialApp(
-
+alsdjfgaoisjdfuhap'
   initialRoute: '/',
   routes: {
     '/':(context) =>customer(),
