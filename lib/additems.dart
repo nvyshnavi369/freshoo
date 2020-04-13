@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:flutterapp/crud.dart';
 import 'shops.dart';
 
 class additems extends StatefulWidget {
@@ -22,44 +23,88 @@ class _additemsState extends State<additems> {
         quantity: '10',
         imageUrl: 'images/chinese-new-year-food-feast.jpg')
   ];
+  String name,url;
+  crudMethods crudObj=new crudMethods();
+
+  Future<bool>dialogTrigger(BuildContext context)async{
+    return showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder:(BuildContext context){
+        return AlertDialog(
+          title: Text('job done'),
+          content: Text('added'),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('alright'),
+              onPressed: (){
+                Navigator.of(context).pop();
+              },
+            )
+          ],
+        );
+      }
+    );
+  }
+
+
   createAlertDialog(BuildContext context){
     return showDialog(context: context,builder: (context){
-      return AlertDialog(
-        content: Column(
-          children: <Widget>[
-            Row(
+      return Container(
+        child: AlertDialog(
+          content: Column(
             children: <Widget>[
-              Text('Name :'),
-              Container(
-                width:150,
-                child: TextField(
-                  decoration: InputDecoration(
-                    hintText: 'item name',
-                  ),
-                ),
-              )
-            ],
-            ),
-            Row(
+              Row(
               children: <Widget>[
-                Text('Url :'),
+                Text('Name :'),
                 Container(
                   width:150,
                   child: TextField(
                     decoration: InputDecoration(
-                      hintText: 'paste url',
+                      hintText: 'item name',
                     ),
+                    onChanged: (value){
+                      this.name=value;
+                    },
                   ),
                 )
               ],
-            ),
-            RaisedButton(
-              child: Text('Submit'),
-              onPressed: (){
-                Navigator.pushNamed(context,'/items');},
-            )
-          ],
-        )
+              ),
+              Row(
+                children: <Widget>[
+                  Text('Url :'),
+                  Container(
+                    width:150,
+                    child: TextField(
+                      decoration: InputDecoration(
+                        hintText: 'paste url',
+                      ),
+                      onChanged: (value){
+                        this.url=value;
+                      },
+                    ),
+                  )
+                ],
+              ),
+              RaisedButton(
+                child: Text('Submit'),
+                onPressed: (){
+                  Navigator.of(context).pop();
+                  Map<String, String> itemData={
+                    'item_name':this.name,
+                    'item_url' :this.url
+                  };
+                  print(itemData);
+                  crudObj.addData(itemData).then((result){
+                    dialogTrigger(context);
+                  }).catchError((e){
+                    print(e);
+                  });
+                  Navigator.pushNamed(context,'/items');},
+              )
+            ],
+          )
+        ),
       );
     });
   }
