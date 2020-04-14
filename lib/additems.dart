@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -25,7 +26,8 @@ class _additemsState extends State<additems> {
   ];
   String name,url,quantity;
   crudMethods crudObj=new crudMethods();
-
+  QuerySnapshot retailer;
+  String retId;
   Future<bool>dialogTrigger(BuildContext context)async{
     return showDialog(
       context: context,
@@ -47,7 +49,16 @@ class _additemsState extends State<additems> {
     );
   }
 
-
+  @override
+  void initState(){
+    crudObj.getRetailer().then((results){
+      if(results==null){print('no retailer');}
+      setState(() {
+        retailer=results;
+      });
+    });
+    super.initState();
+  }
   createAlertDialog(BuildContext context){
     return showDialog(context: context,builder: (context){
       return Container(
@@ -105,18 +116,28 @@ class _additemsState extends State<additems> {
               RaisedButton(
                 child: Text('Submit'),
                 onPressed: (){
-                  Navigator.of(context).pop();
-                  Map<String, String> itemData={
-                    'category':'fruits',
-                    'item_url' :this.url,
-                    'item_quantity':this.quantity
-                  };
-                  print(itemData);
-                  crudObj.addData(itemData,this.name).then((result){
-                    dialogTrigger(context);
-                  }).catchError((e){
-                    print(e);
-                  });
+                  if(name!=null) {
+                    Navigator.of(context).pop();
+                    Map<String, String> itemData = {
+                      'category': 'fruits',
+                      'item_url': this.url,
+                      'item_quantity': "1"
+                    };
+                    Map<String, String>retItem = {
+                      'quantity': this.quantity,
+                      'quantity_type': ''
+                    };
+                    print(itemData);
+                    DocumentSnapshot ret = retailer.documents[0];
+                    retId = ret.documentID;
+                    crudObj.addData(itemData, this.name, retId, retItem).
+                    then((result) {
+                      dialogTrigger(context);
+                    }).
+                    catchError((e) {
+                      print(e);
+                    });
+                  }
                   Navigator.pushNamed(context,'/items');},
               )
             ],

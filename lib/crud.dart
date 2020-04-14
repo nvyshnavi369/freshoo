@@ -13,12 +13,12 @@ class crudMethods{
     }
   }
 
-  Future<void> addData(item,id) async{
+  Future<void> addData(item,id,retId,ret) async{
     if(true){
       Firestore.instance.collection('Item').document(id).setData(item).catchError((e){
         print(e);
       });
-      Firestore.instance.collection('Retailer').add({'name':"",'shop_name':"",'shop_url':""}).catchError((e){
+      Firestore.instance.collection('Retailer').document(retId).collection('items').document(id).setData(ret).catchError((e){
         print(e);
       });
     }
@@ -26,8 +26,10 @@ class crudMethods{
       print('you need to be logged in');
     }
   }
-  getData() async{
-    return await Firestore.instance.collection('Item').getDocuments();
+  getRetailerItems() async{
+    return await Firestore.instance.collection('Retailer').document('qCvJAHc3th4ZgQzoatQ1').collection('items').getDocuments();
   }
-
+  getRetailer() async{
+    return await Firestore.instance.collection('Retailer').getDocuments();
+  }
 }

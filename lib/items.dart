@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:flutterapp/crud.dart';
-import 'shops.dart';
 
 class items extends StatefulWidget {
   @override
@@ -15,36 +14,18 @@ class _itemsState extends State<items> {
   @override
   crudMethods crudObj=new crudMethods();
   String id;
-    List<Item> itemss = [
-      Item(
-          name: 'Apple',
-          quantity: '10',
-          imageUrl: 'images/chinese-new-year-food-feast.jpg'),
-      Item(
-          name: 'Banana',
-          quantity: '10',
-          imageUrl: 'images/chinese-new-year-food-feast.jpg'),
-      Item(
-          name: 'Apple',
-          quantity: '10',
-          imageUrl: 'images/chinese-new-year-food-feast.jpg')
-    ];
   int selectedRadio;
   QuerySnapshot items;
   @override
   void initState(){
     selectedRadio=0;
-    print('entered');
-    crudObj.getData().then((results){
-      if(results==null){print('qwerrttyyuu');}
-      print('this');
+    crudObj.getRetailerItems().then((results){
+      if(results==null){print('no data');}
       setState(() {
-        print('yaaa');
         items=results;
       });
     });
     super.initState();
-    print('done');
   }
   setSelectedRadio(int val){
     setState(() {
@@ -84,7 +65,7 @@ class _itemsState extends State<items> {
                           width: 100,
                           child: TextField(
                             decoration: InputDecoration(
-                              hintText: Item.data['item_quantity'],
+                              hintText: Item.data['quantity'],
                             ),
                           ),
                         ),
