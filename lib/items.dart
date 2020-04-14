@@ -1,7 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:flutterapp/crud.dart';
 import 'shops.dart';
 
 class items extends StatefulWidget {
@@ -11,9 +13,9 @@ class items extends StatefulWidget {
 
 class _itemsState extends State<items> {
   @override
-
-
-    List<Item> items = [
+  crudMethods crudObj=new crudMethods();
+  String id;
+    List<Item> itemss = [
       Item(
           name: 'Apple',
           quantity: '10',
@@ -28,9 +30,21 @@ class _itemsState extends State<items> {
           imageUrl: 'images/chinese-new-year-food-feast.jpg')
     ];
   int selectedRadio;
+  QuerySnapshot items;
+  @override
   void initState(){
-    super.initState();
     selectedRadio=0;
+    print('entered');
+    crudObj.getData().then((results){
+      if(results==null){print('qwerrttyyuu');}
+      print('this');
+      setState(() {
+        print('yaaa');
+        items=results;
+      });
+    });
+    super.initState();
+    print('done');
   }
   setSelectedRadio(int val){
     setState(() {
@@ -47,7 +61,7 @@ class _itemsState extends State<items> {
             Expanded(
               flex: 7,
               child: Image(
-                image: AssetImage(Item.imageUrl),
+                image: AssetImage( 'images/chinese-new-year-food-feast.jpg'),
               ),
             ),
             SizedBox(width: 10),
@@ -58,7 +72,7 @@ class _itemsState extends State<items> {
                   children: <Widget>[
                     Center(
                       child: Text(
-                          Item.name,
+                          id,
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                           )),
@@ -70,7 +84,7 @@ class _itemsState extends State<items> {
                           width: 100,
                           child: TextField(
                             decoration: InputDecoration(
-                              hintText: Item.quantity,
+                              hintText: Item.data['item_quantity'],
                             ),
                           ),
                         ),
@@ -108,12 +122,18 @@ class _itemsState extends State<items> {
     }
 
     Widget list() {
-      return ListView.builder(
-          itemCount: items.length,
-          itemBuilder: (BuildContext content, int index) {
-            Item item = items[index];
-            return buildRow(item);
-          });
+      if (items != null) {
+        return ListView.builder(
+            itemCount: items.documents.length,
+            itemBuilder: (BuildContext content, int index) {
+              DocumentSnapshot item = items.documents[index];
+              id=item.documentID;
+              return buildRow(item);
+            });
+      }
+      else{
+        print('loading');
+      }
     }
 
 

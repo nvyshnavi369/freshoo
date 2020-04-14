@@ -23,7 +23,7 @@ class _additemsState extends State<additems> {
         quantity: '10',
         imageUrl: 'images/chinese-new-year-food-feast.jpg')
   ];
-  String name,url;
+  String name,url,quantity;
   crudMethods crudObj=new crudMethods();
 
   Future<bool>dialogTrigger(BuildContext context)async{
@@ -86,16 +86,33 @@ class _additemsState extends State<additems> {
                   )
                 ],
               ),
+              Row(
+                children: <Widget>[
+                  Text('quantity :'),
+                  Container(
+                    width:150,
+                    child: TextField(
+                      decoration: InputDecoration(
+                        hintText: 'quantity',
+                      ),
+                      onChanged: (value){
+                        this.quantity=value;
+                      },
+                    ),
+                  )
+                ],
+              ),
               RaisedButton(
                 child: Text('Submit'),
                 onPressed: (){
                   Navigator.of(context).pop();
                   Map<String, String> itemData={
-                    'item_name':this.name,
-                    'item_url' :this.url
+                    'category':'fruits',
+                    'item_url' :this.url,
+                    'item_quantity':this.quantity
                   };
                   print(itemData);
-                  crudObj.addData(itemData).then((result){
+                  crudObj.addData(itemData,this.name).then((result){
                     dialogTrigger(context);
                   }).catchError((e){
                     print(e);

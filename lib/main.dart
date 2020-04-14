@@ -15,7 +15,6 @@ void main() => runApp(MaterialApp(
 ));
 class customer extends StatefulWidget {
   @override
-
   _customerState createState() => _customerState();
 }
 

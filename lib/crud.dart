@@ -1,4 +1,3 @@
-import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -14,9 +13,12 @@ class crudMethods{
     }
   }
 
-  Future<void> addData(item) async{
+  Future<void> addData(item,id) async{
     if(true){
-      Firestore.instance.collection('Item').add(item).catchError((e){
+      Firestore.instance.collection('Item').document(id).setData(item).catchError((e){
+        print(e);
+      });
+      Firestore.instance.collection('Retailer').add({'name':"",'shop_name':"",'shop_url':""}).catchError((e){
         print(e);
       });
     }
@@ -24,4 +26,8 @@ class crudMethods{
       print('you need to be logged in');
     }
   }
+  getData() async{
+    return await Firestore.instance.collection('Item').getDocuments();
+  }
+
 }
