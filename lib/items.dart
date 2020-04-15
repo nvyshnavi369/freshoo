@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:flutterapp/crud.dart';
+import 'main.dart';
 
 class items extends StatefulWidget {
   @override
@@ -13,6 +14,7 @@ class items extends StatefulWidget {
 class _itemsState extends State<items> {
   @override
   crudMethods crudObj=new crudMethods();
+  customer cust=new customer();
   String id;
   int selectedRadio;
   QuerySnapshot items;

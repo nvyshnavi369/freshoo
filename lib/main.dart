@@ -1,7 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'shops.dart';
+import 'package:flutterapp/crud.dart';
 import 'items.dart';
 import 'additems.dart';
 
@@ -10,7 +11,7 @@ void main() => runApp(MaterialApp(
   routes: {
     '/':(context) =>customer(),
     '/items':(context) =>items(),
-    '/additems':(contex) =>additems(),
+    '/additems':(context) =>additems(),
   },
 ));
 class customer extends StatefulWidget {
@@ -19,41 +20,11 @@ class customer extends StatefulWidget {
 }
 
 class _customerState extends State<customer> {
-  List<Shop>shops = [
-    Shop(name: 'Local Mart',
-        imageUrl: 'images/chinese-new-year-food-feast.jpg'),
-    Shop(name: 'Daily Needs',
-        imageUrl: 'images/chinese-new-year-food-feast.jpg'),
-    Shop(name: 'Local Mart',
-        imageUrl: 'images/chinese-new-year-food-feast.jpg'),
-    Shop(name: 'Daily Needs',
-        imageUrl: 'images/chinese-new-year-food-feast.jpg'),
-    Shop(name: 'Local Mart',
-        imageUrl: 'images/chinese-new-year-food-feast.jpg'),
-    Shop(name: 'Daily Needs',
-        imageUrl: 'images/chinese-new-year-food-feast.jpg'),
-  ];
-  createAlertDialog(BuildContext context){
-    return showDialog(context: context,builder: (context){
-      return AlertDialog(
-        title:Text('item name'),
-        content: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: <Widget>[
-            Text('item quantity'),
-            RaisedButton(
-              onPressed: (){
-                Navigator.pushNamed(context,'/');
-              },
-              child: Text('OK'),
-            )
-          ],
-        ),
-      );
-    });
-  }
-
-  Widget buildRow(Shop) {
+  String retID="qCvJAHc3th4ZgQzoatQ1";                     //here the id should be sent to
+  crudMethods crudObj=new crudMethods();
+  QuerySnapshot items;
+  String transactionId;
+  Widget buildRow(Item) {
     return Card(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -61,7 +32,7 @@ class _customerState extends State<customer> {
           Expanded(
             flex: 7,
             child: Image(
-              image: AssetImage(Shop.imageUrl),
+              image: AssetImage('images/chinese-new-year-food-feast.jpg'),
             ),
           ),
           SizedBox(width: 10),
@@ -71,7 +42,7 @@ class _customerState extends State<customer> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Center(
-                    child: Text(Shop.name,
+                    child: Text(Item.data['store_name'],
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                         )
@@ -81,12 +52,12 @@ class _customerState extends State<customer> {
                     children: <Widget>[
                       IconButton(
                         onPressed: (){
-                          createAlertDialog(context);
                         },
                         icon: Icon(Icons.call_made),
                         color: Colors.blue,
                       ),
-
+                      Text(Item.data['item_name']),
+                      Text(Item.data['item_quantity']),
                     ],
                   ),
                 ],
@@ -98,19 +69,31 @@ class _customerState extends State<customer> {
   }
 
   Widget list() {
-    return ListView.builder(
-        itemCount: shops.length,
-        itemBuilder: (BuildContext content, int index) {
-          Shop shop = shops[index];
-          return buildRow(shop);
-        });
+    if (items != null) {
+      return ListView.builder(
+          itemCount: items.documents.length,
+          itemBuilder: (BuildContext content, int index) {
+            DocumentSnapshot item = items.documents[index];
+            transactionId=item.documentID;
+            return buildRow(item);
+          });
+    }
+    else{
+      print('loading');
+    }
   }
 
   @override
-  Widget build(BuildContext context) {
+   Widget build(BuildContext context) {
+    crudObj.getTransactions(retID).then((results){
+      if(results==null){print('no data');}
+      setState(() {
+        items=results;
+      });
+    });
     return Scaffold(
         appBar: AppBar(
-          title: Center(child: Text('REQUESTS')),
+          title: Center(child: Text('SALES')),
           leading:Row(
             children: <Widget>[
               GestureDetector(

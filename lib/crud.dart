@@ -32,4 +32,7 @@ class crudMethods{
   getRetailer() async{
     return await Firestore.instance.collection('Retailer').getDocuments();
   }
+  getTransactions(id) async{
+    return await Firestore.instance.collection('Transaction').where('retailer_id',isEqualTo:id).getDocuments();
+  }
 }
