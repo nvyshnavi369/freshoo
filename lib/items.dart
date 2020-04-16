@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:flutterapp/crud.dart';
-import 'main.dart';
 
 class items extends StatefulWidget {
   @override
@@ -14,19 +13,12 @@ class items extends StatefulWidget {
 class _itemsState extends State<items> {
   @override
   crudMethods crudObj=new crudMethods();
-  customer cust=new customer();
   String id;
   int selectedRadio;
   QuerySnapshot items;
   @override
   void initState(){
     selectedRadio=0;
-    crudObj.getRetailerItems().then((results){
-      if(results==null){print('no data');}
-      setState(() {
-        items=results;
-      });
-    });
     super.initState();
   }
   setSelectedRadio(int val){
@@ -93,7 +85,7 @@ class _itemsState extends State<items> {
                             setSelectedRadio(val);
                           },
                         ),
-                        Text('Liter')
+                        Text('Litre')
                       ],
                     ),
                   ],
@@ -122,6 +114,14 @@ class _itemsState extends State<items> {
 
     @override
     Widget build(BuildContext context) {
+
+    final String retID = ModalRoute.of(context).settings.arguments;
+    crudObj.getRetailerItems(retID).then((results){
+      if(results==null){print('no data');}
+      setState(() {
+        items=results;
+      });
+    });
       return Scaffold(
           appBar: AppBar(
             title: Center(child: Text('ITEMS')),
@@ -151,7 +151,7 @@ class _itemsState extends State<items> {
                   child: Icon(Icons.add),
                   label: 'new item',
                   onTap: () {
-                    Navigator.pushNamed(context, '/additems');
+                    Navigator.pushNamed(context, '/additems',arguments: retID);
                   }),
               SpeedDialChild(
                   child: Icon(Icons.send),

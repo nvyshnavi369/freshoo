@@ -123,7 +123,7 @@ class _customerState extends State<customer> {
         ),
         floatingActionButton:FloatingActionButton.extended(
           onPressed: (){
-            Navigator.pushNamed(context,'/items');
+            Navigator.pushNamed(context,'/items',arguments: retID);
           },
           label: Text('Items'),
         ) ,

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:flutterapp/crud.dart';
-import 'shops.dart';
+
 
 class additems extends StatefulWidget {
   @override
@@ -12,22 +12,23 @@ class additems extends StatefulWidget {
 }
 
 class _additemsState extends State<additems> {
-  @override
-  List<Item>items = [
-    Item(name: 'Apple',
-        quantity: '10',
-        imageUrl: 'images/chinese-new-year-food-feast.jpg'),
-    Item(name: 'Banana',
-        quantity: '10',
-        imageUrl: 'images/chinese-new-year-food-feast.jpg'),
-    Item(name: 'Apple',
-        quantity: '10',
-        imageUrl: 'images/chinese-new-year-food-feast.jpg')
-  ];
   String name,url,quantity;
   crudMethods crudObj=new crudMethods();
-  QuerySnapshot retailer;
+  QuerySnapshot items;
+  DocumentSnapshot retailer;
   String retId;
+  int selectedRadio;
+  String retName;
+  @override
+  void initState(){
+    selectedRadio=0;
+    super.initState();
+  }
+  setSelectedRadio(int val){
+    setState(() {
+      selectedRadio=val;
+    });
+  }
   Future<bool>dialogTrigger(BuildContext context)async{
     return showDialog(
       context: context,
@@ -49,132 +50,179 @@ class _additemsState extends State<additems> {
     );
   }
 
-  @override
-  void initState(){
-    crudObj.getRetailer().then((results){
-      if(results==null){print('no retailer');}
+  createAlertDialog(BuildContext context) {
+    final String retID = ModalRoute
+        .of(context)
+        .settings
+        .arguments;
+    print(retID);
+    crudObj.getRetailer(retID).then((results) {
+      if (results == null) {
+        print('no data');
+      }
       setState(() {
-        retailer=results;
+        retailer = results;
       });
     });
-    super.initState();
-  }
-  createAlertDialog(BuildContext context){
-    return showDialog(context: context,builder: (context){
-      return Container(
-        child: AlertDialog(
-          content: Column(
-            children: <Widget>[
-              Row(
-              children: <Widget>[
-                Text('Name :'),
-                Container(
-                  width:150,
-                  child: TextField(
-                    decoration: InputDecoration(
-                      hintText: 'item name',
-                    ),
-                    onChanged: (value){
-                      this.name=value;
-                    },
+    if (retailer != null) {
+      return showDialog(context: context, builder: (context) {
+        return Container(
+          child: AlertDialog(
+              content: Column(
+                children: <Widget>[
+                  Row(
+                    children: <Widget>[
+                      Text('Name :'),
+                      Container(
+                        width: 150,
+                        child: TextField(
+                          decoration: InputDecoration(
+                            hintText: 'item name',
+                          ),
+                          onChanged: (value) {
+                            this.name = value;
+                          },
+                        ),
+                      )
+                    ],
                   ),
-                )
-              ],
-              ),
-              Row(
-                children: <Widget>[
-                  Text('Url :'),
-                  Container(
-                    width:150,
-                    child: TextField(
-                      decoration: InputDecoration(
-                        hintText: 'paste url',
+                  Row(
+                    children: <Widget>[
+                      Text('Url :'),
+                      Container(
+                        width: 150,
+                        child: TextField(
+                          decoration: InputDecoration(
+                            hintText: 'paste url',
+                          ),
+                          onChanged: (value) {
+                            this.url = value;
+                          },
+                        ),
+                      )
+                    ],
+                  ),
+                  Row(
+                    children: <Widget>[
+                      Text('quantity :'),
+                      Container(
+                        width: 150,
+                        child: TextField(
+                          decoration: InputDecoration(
+                            hintText: 'quantity',
+                          ),
+                          onChanged: (value) {
+                            this.quantity = value;
+                          },
+                        ),
+                      )
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: <Widget>[
+                      Radio(
+                        value: 1,
+                        onChanged: (value) {
+                          setSelectedRadio(value);
+                        },
+                        groupValue: selectedRadio,
+                        activeColor: Colors.blue,
                       ),
-                      onChanged: (value){
-                        this.url=value;
-                      },
-                    ),
+                      Text('kg'),
+                      Radio(
+                        value: 2,
+                        onChanged: (value) {
+                          setSelectedRadio(value);
+                        },
+                        groupValue: selectedRadio,
+                        activeColor: Colors.blue,
+                      ),
+                      Text('Liter')
+                    ],
+                  ),
+                  RaisedButton(
+                    child: Text('Submit'),
+                    onPressed: () {
+                      if (name != null) {
+                        Navigator.of(context).pop();
+                        Map<String, String> itemData = {
+                          'category': 'fruits',
+                          'item_url': this.url,
+                          'item_quantity': "1"
+                        };
+
+
+                        Map<String, String>retItem = {
+                          'quantity': this.quantity,
+                          'quantity_type': '',
+                          'retailer_id': retID,
+                          'retailer_name': retailer.data['name']
+                        };
+                        crudObj.addData(itemData, this.name, retID, retItem).
+                        then((result) {
+                          dialogTrigger(context);
+                        }).
+                        catchError((e) {
+                          print(e);
+                        });
+                      }
+                      Navigator.pushNamed(context, '/items',arguments: retID);
+                    },
                   )
                 ],
-              ),
-              Row(
-                children: <Widget>[
-                  Text('quantity :'),
-                  Container(
-                    width:150,
-                    child: TextField(
-                      decoration: InputDecoration(
-                        hintText: 'quantity',
-                      ),
-                      onChanged: (value){
-                        this.quantity=value;
-                      },
-                    ),
-                  )
-                ],
-              ),
-              RaisedButton(
-                child: Text('Submit'),
-                onPressed: (){
-                  if(name!=null) {
-                    Navigator.of(context).pop();
-                    Map<String, String> itemData = {
-                      'category': 'fruits',
-                      'item_url': this.url,
-                      'item_quantity': "1"
-                    };
-                    Map<String, String>retItem = {
-                      'quantity': this.quantity,
-                      'quantity_type': ''
-                    };
-                    print(itemData);
-                    DocumentSnapshot ret = retailer.documents[0];
-                    retId = ret.documentID;
-                    crudObj.addData(itemData, this.name, retId, retItem).
-                    then((result) {
-                      dialogTrigger(context);
-                    }).
-                    catchError((e) {
-                      print(e);
-                    });
-                  }
-                  Navigator.pushNamed(context,'/items');},
               )
-            ],
-          )
-        ),
-      );
-    });
+          ),
+        );
+      });
+    }
+    else {
+      print('loading');
+    }
   }
   Widget grid() {
-    return OrientationBuilder(builder: (context,orientation){
-      return GridView.count(crossAxisCount: orientation==Orientation.portrait?2:3,
-        crossAxisSpacing: 20,
-        children:
-          List.generate(items.length, (index){
+    if (items != null) {
+
+      return OrientationBuilder(builder: (context, orientation) {
+        return GridView.count(
+          crossAxisCount: orientation == Orientation.portrait ? 2 : 3,
+          crossAxisSpacing: 20,
+          children:
+          List.generate(items.documents.length, (index) {
             return Column(
               children: <Widget>[
                 SizedBox(height: 20),
-                Image(image: AssetImage(items[index].imageUrl)),
+                Image(image: AssetImage('images/chinese-new-year-food-feast.jpg')),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    Text(items[index].name),
+                    Text(items.documents[index].documentID),
                     IconButton(
                       icon: Icon(Icons.check),
-                      onPressed: (){},
+                      onPressed: () {},
                     )
                   ],
                 )
               ],
             );
           }),
-      );
-    });
+        );
+      });
+    }
+    else{
+      print('loading');
+    }
   }
 
 
   Widget build(BuildContext context) {
+    final String retID = ModalRoute.of(context).settings.arguments;
+    crudObj.getNewItems(retID).then((results){
+      if(results==null){print('no data');}
+      setState(() {
+        items=results;
+      });
+    });
     return  Scaffold(
       appBar: AppBar(
         title: Center(child: Text('NEW')),

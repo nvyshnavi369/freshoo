@@ -26,13 +26,16 @@ class crudMethods{
       print('you need to be logged in');
     }
   }
-  getRetailerItems() async{
-    return await Firestore.instance.collection('Retailer').document('qCvJAHc3th4ZgQzoatQ1').collection('items').getDocuments();
+  getRetailerItems(id) async{
+    return await Firestore.instance.collection('Retailer').document(id).collection('items').getDocuments();
   }
-  getRetailer() async{
-    return await Firestore.instance.collection('Retailer').getDocuments();
+  getRetailer(id) async{
+    return await Firestore.instance.collection('Retailer').document(id).get();
   }
   getTransactions(id) async{
     return await Firestore.instance.collection('Transaction').where('retailer_id',isEqualTo:id).getDocuments();
+  }
+  getNewItems(id) async{
+    return await Firestore.instance.collection('Item').getDocuments();
   }
 }
