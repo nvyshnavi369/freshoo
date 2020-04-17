@@ -16,7 +16,11 @@ class _itemsState extends State<items> {
   String id,quantity,cost,type;
   QuerySnapshot items;
 
-  Widget buildRow(Item) {
+  Widget buildRow(Item,id) {
+    final String retID = ModalRoute
+        .of(context)
+        .settings
+        .arguments;
     if(Item.data['quantity_type']==null){type='unit';}
     else{type=Item.data['quantity_type'];}
     return Card(
@@ -53,6 +57,13 @@ class _itemsState extends State<items> {
                           ),
                           onChanged: (value){
                             this.quantity=value;
+                            Map<String,String>ret={
+                              'quantity':this.quantity
+                            };
+                            crudObj.updateData(id, retID,ret).then((result){
+                            }).catchError((e){
+                              print(e);
+                            });
                           },
                         ),
                       ),
@@ -69,6 +80,13 @@ class _itemsState extends State<items> {
                           ),
                           onChanged: (value){
                             this.cost=value;
+                            Map<String,String>ret={
+                              'cost':this.cost
+                            };
+                            crudObj.updateData(id, retID,ret).then((result){
+                            }).catchError((e){
+                              print(e);
+                            });
                           },
                         ),
                       ),
@@ -91,7 +109,7 @@ class _itemsState extends State<items> {
           itemBuilder: (BuildContext content, int index) {
             DocumentSnapshot item = items.documents[index];
             id = item.documentID;
-            return buildRow(item);
+            return buildRow(item,id);
           });
     }
     else {

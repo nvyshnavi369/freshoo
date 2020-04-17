@@ -233,7 +233,6 @@ class _additemsState extends State<additems> {
                         };
                         crudObj.addItem(items.documents[index].documentID , retID, retItem).
                         then((result) {
-                          print('ss');
                           dialogTrigger(context);
                         }).
                         catchError((e) {

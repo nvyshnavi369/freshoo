@@ -27,7 +27,7 @@ class crudMethods{
     }
   }
 
-  Future<void>addItem(id,retId,ret){
+  Future<void>addItem(id,retId,ret) async{
     Firestore.instance.collection('Retailer').document(retId).collection('items').document(id).setData(ret).catchError((e){
       print(e);
     });
@@ -45,5 +45,13 @@ class crudMethods{
   }
   getNewItems(id) async{
     return await Firestore.instance.collection('Item').getDocuments();
+  }
+
+
+  Future<void>updateData(id,retId,ret) async{
+    print('yes');
+    Firestore.instance.collection('Retailer').document(retId).collection('items').document(id).updateData(ret).catchError((e){
+       print(e);
+     });
   }
 }
