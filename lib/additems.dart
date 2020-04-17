@@ -12,7 +12,7 @@ class additems extends StatefulWidget {
 }
 
 class _additemsState extends State<additems> {
-  String name,url,quantity;
+  String name,url,quantity,type,category,cost;
   crudMethods crudObj=new crudMethods();
   QuerySnapshot items;
   DocumentSnapshot retailer;
@@ -55,15 +55,7 @@ class _additemsState extends State<additems> {
         .of(context)
         .settings
         .arguments;
-    print(retID);
-    crudObj.getRetailer(retID).then((results) {
-      if (results == null) {
-        print('no data');
-      }
-      setState(() {
-        retailer = results;
-      });
-    });
+
     if (retailer != null) {
       return showDialog(context: context, builder: (context) {
         return Container(
@@ -119,45 +111,64 @@ class _additemsState extends State<additems> {
                     ],
                   ),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: <Widget>[
-                      Radio(
-                        value: 1,
-                        onChanged: (value) {
-                          setSelectedRadio(value);
-                        },
-                        groupValue: selectedRadio,
-                        activeColor: Colors.blue,
-                      ),
-                      Text('kg'),
-                      Radio(
-                        value: 2,
-                        onChanged: (value) {
-                          setSelectedRadio(value);
-                        },
-                        groupValue: selectedRadio,
-                        activeColor: Colors.blue,
-                      ),
-                      Text('Liter')
+                      Text('cost :'),
+                      Container(
+                        width: 150,
+                        child: TextField(
+                          decoration: InputDecoration(
+                            hintText: 'per unit',
+                          ),
+                          onChanged: (value) {
+                            this.cost = value;
+                          },
+                        ),
+                      )
                     ],
                   ),
+                  SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: <Widget>[
+                      PopupMenuButton(
+                        child: Text('Type',style: TextStyle(color: Colors.blue),
+                        ),
+                        itemBuilder: (_) => [
+                          PopupMenuItem(child: Text('kg'), value: 'kg',),
+                          PopupMenuItem(child: Text('litre'), value: 'litre'),
+                        ],
+                        onSelected: (value) => type=value,
+                      ),
+                      PopupMenuButton(
+                        child: Text('Category',style: TextStyle(color: Colors.blue),
+                         ),
+                        itemBuilder: (_) => [
+                          PopupMenuItem(child: Text('fruites'), value: 'fruits',),
+                          PopupMenuItem(child: Text('vegitables'), value: 'vegitables'),
+                        ],
+                        onSelected: (value) => category=value,
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 20),
                   RaisedButton(
                     child: Text('Submit'),
                     onPressed: () {
                       if (name != null) {
                         Navigator.of(context).pop();
                         Map<String, String> itemData = {
-                          'category': 'fruits',
+                          'category': this.category,
                           'item_url': this.url,
-                          'item_quantity': "1"
+                          'quantity_type': this.type
                         };
 
 
                         Map<String, String>retItem = {
                           'quantity': this.quantity,
-                          'quantity_type': '',
+                          'quantity_type': this.type,
                           'retailer_id': retID,
-                          'retailer_name': retailer.data['name']
+                          'retailer_name': retailer.data['name'],
+                          'cost':this.cost
                         };
                         crudObj.addData(itemData, this.name, retID, retItem).
                         then((result) {
@@ -181,6 +192,19 @@ class _additemsState extends State<additems> {
     }
   }
   Widget grid() {
+    final String retID = ModalRoute
+        .of(context)
+        .settings
+        .arguments;
+    crudObj.getRetailer(retID).then((results) {
+      if (results == null) {
+        print('no data');
+      }
+      setState(() {
+        retailer = results;
+      });
+    });
+    if(retailer!=null){
     if (items != null) {
 
       return OrientationBuilder(builder: (context, orientation) {
@@ -199,7 +223,23 @@ class _additemsState extends State<additems> {
                     Text(items.documents[index].documentID),
                     IconButton(
                       icon: Icon(Icons.check),
-                      onPressed: () {},
+                      onPressed: () {
+                        Map<String, String>retItem = {
+                          'quantity': "0",
+                          'quantity_type':items.documents[index].data['quantity_type'],
+                          'retailer_id': retID,
+                          'retailer_name': retailer.data['name'],
+                          'cost':'0'
+                        };
+                        crudObj.addItem(items.documents[index].documentID , retID, retItem).
+                        then((result) {
+                          print('ss');
+                          dialogTrigger(context);
+                        }).
+                        catchError((e) {
+                          print(e);
+                        });
+                      },
                     )
                   ],
                 )
@@ -210,6 +250,10 @@ class _additemsState extends State<additems> {
       });
     }
     else{
+      print('loading');
+    }
+  }
+    else {
       print('loading');
     }
   }
@@ -259,7 +303,7 @@ class _additemsState extends State<additems> {
               child:Icon(Icons.send),
               label:'Submit',
               onTap: (){
-                Navigator.pushNamed(context,'/items');}
+                Navigator.pushNamed(context,'/items',arguments: retID);}
           )
         ],
       )

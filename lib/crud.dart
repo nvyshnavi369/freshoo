@@ -26,6 +26,14 @@ class crudMethods{
       print('you need to be logged in');
     }
   }
+
+  Future<void>addItem(id,retId,ret){
+    Firestore.instance.collection('Retailer').document(retId).collection('items').document(id).setData(ret).catchError((e){
+      print(e);
+    });
+  }
+
+
   getRetailerItems(id) async{
     return await Firestore.instance.collection('Retailer').document(id).collection('items').getDocuments();
   }
