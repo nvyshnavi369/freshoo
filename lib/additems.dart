@@ -14,21 +14,12 @@ class additems extends StatefulWidget {
 class _additemsState extends State<additems> {
   String name,url,quantity,type,category,cost;
   crudMethods crudObj=new crudMethods();
-  QuerySnapshot items;
+  List items;
   DocumentSnapshot retailer;
   String retId;
   int selectedRadio;
   String retName;
   @override
-  void initState(){
-    selectedRadio=0;
-    super.initState();
-  }
-  setSelectedRadio(int val){
-    setState(() {
-      selectedRadio=val;
-    });
-  }
   Future<bool>dialogTrigger(BuildContext context)async{
     return showDialog(
       context: context,
@@ -212,7 +203,7 @@ class _additemsState extends State<additems> {
           crossAxisCount: orientation == Orientation.portrait ? 2 : 3,
           crossAxisSpacing: 20,
           children:
-          List.generate(items.documents.length, (index) {
+          List.generate(items.length, (index) {
             return Column(
               children: <Widget>[
                 SizedBox(height: 20),
@@ -220,18 +211,18 @@ class _additemsState extends State<additems> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    Text(items.documents[index].documentID),
+                    Text(items[index].documentID),
                     IconButton(
                       icon: Icon(Icons.check),
                       onPressed: () {
                         Map<String, String>retItem = {
                           'quantity': "0",
-                          'quantity_type':items.documents[index].data['quantity_type'],
+                          'quantity_type':items[index].data['quantity_type'],
                           'retailer_id': retID,
                           'retailer_name': retailer.data['name'],
                           'cost':'0'
                         };
-                        crudObj.addItem(items.documents[index].documentID , retID, retItem).
+                        crudObj.addItem(items[index].documentID , retID, retItem).
                         then((result) {
                           dialogTrigger(context);
                         }).
