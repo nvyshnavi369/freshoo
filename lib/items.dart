@@ -13,16 +13,14 @@ class items extends StatefulWidget {
 class _itemsState extends State<items> {
   @override
   crudMethods crudObj = new crudMethods();
-  String id,quantity,cost,type;
+  String id,quantity,cost,type,url;
   QuerySnapshot items;
 
-  Widget buildRow(Item,id) {
+  Widget buildRow(Item,id,url) {
     final String retID = ModalRoute
         .of(context)
         .settings
         .arguments;
-    if(Item.data['quantity_type']==null){type='unit';}
-    else{type=Item.data['quantity_type'];}
     return Card(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -30,7 +28,7 @@ class _itemsState extends State<items> {
             Expanded(
               flex: 7,
               child: Image(
-                image: AssetImage('images/chinese-new-year-food-feast.jpg'),
+                image: NetworkImage(url),
               ),
             ),
             SizedBox(width: 10),
@@ -90,7 +88,9 @@ class _itemsState extends State<items> {
                           },
                         ),
                       ),
-                      Text('(per $type )'),
+                      Text('(per '),
+                      Text(Item.data['quantity_type'] ),
+                      Text(')')
                     ],
                   ),
                 ],
@@ -109,7 +109,13 @@ class _itemsState extends State<items> {
           itemBuilder: (BuildContext content, int index) {
             DocumentSnapshot item = items.documents[index];
             id = item.documentID;
-            return buildRow(item,id);
+            if(item.data['item_url']==null){
+              url='https://chinesenewyear.imgix.net/assets/images/food/chinese-new-year-food-feast.jpg?q=50&w=1920&h=1080&fit=crop&auto=format';
+            }
+            else{
+              url=item.data['item_url'];
+            }
+            return buildRow(item,id,url);
           });
     }
     else {

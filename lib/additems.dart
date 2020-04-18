@@ -16,7 +16,7 @@ class _additemsState extends State<additems> {
   crudMethods crudObj=new crudMethods();
   List items;
   DocumentSnapshot retailer;
-  String retId;
+  String retId,urll;
   int selectedRadio;
   String retName;
   @override
@@ -127,6 +127,7 @@ class _additemsState extends State<additems> {
                         itemBuilder: (_) => [
                           PopupMenuItem(child: Text('kg'), value: 'kg',),
                           PopupMenuItem(child: Text('litre'), value: 'litre'),
+                          PopupMenuItem(child: Text('unit'), value: 'unit'),
                         ],
                         onSelected: (value) => type=value,
                       ),
@@ -155,11 +156,13 @@ class _additemsState extends State<additems> {
 
 
                         Map<String, String>retItem = {
+                          'item_url': this.url,
                           'quantity': this.quantity,
                           'quantity_type': this.type,
                           'retailer_id': retID,
                           'retailer_name': retailer.data['name'],
-                          'cost':this.cost
+                          'cost':this.cost,
+                          'item_name':this.name
                         };
                         crudObj.addData(itemData, this.name, retID, retItem).
                         then((result) {
@@ -204,34 +207,48 @@ class _additemsState extends State<additems> {
           crossAxisSpacing: 20,
           children:
           List.generate(items.length, (index) {
+            if(items[index].data['item_url']==null){
+              urll='https://chinesenewyear.imgix.net/assets/images/food/chinese-new-year-food-feast.jpg?q=50&w=1920&h=1080&fit=crop&auto=format';
+            }
+            else{
+              urll=items[index].data['item_url'];
+            }
             return Column(
               children: <Widget>[
                 SizedBox(height: 20),
-                Image(image: AssetImage('images/chinese-new-year-food-feast.jpg')),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Text(items[index].documentID),
-                    IconButton(
-                      icon: Icon(Icons.check),
-                      onPressed: () {
-                        Map<String, String>retItem = {
-                          'quantity': "0",
-                          'quantity_type':items[index].data['quantity_type'],
-                          'retailer_id': retID,
-                          'retailer_name': retailer.data['name'],
-                          'cost':'0'
-                        };
-                        crudObj.addItem(items[index].documentID , retID, retItem).
-                        then((result) {
-                          dialogTrigger(context);
-                        }).
-                        catchError((e) {
-                          print(e);
-                        });
-                      },
-                    )
-                  ],
+                Expanded(
+                  flex: 14,
+                    child: Image(image: NetworkImage(urll))
+                ),
+                Expanded(
+                  flex: 4,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Text(items[index].documentID),
+                      IconButton(
+                        icon: Icon(Icons.check),
+                        onPressed: () {
+                          Map<String, String>retItem = {
+                            'quantity': "0",
+                            'quantity_type':items[index].data['quantity_type'],
+                            'retailer_id': retID,
+                            'retailer_name': retailer.data['name'],
+                            'cost':'0',
+                            'item_url':items[index].data['item_url'],
+                            'item_name':items[index].documentID
+                          };
+                          crudObj.addItem(items[index].documentID , retID, retItem).
+                          then((result) {
+                            dialogTrigger(context);
+                          }).
+                          catchError((e) {
+                            print(e);
+                          });
+                        },
+                      )
+                    ],
+                  ),
                 )
               ],
             );

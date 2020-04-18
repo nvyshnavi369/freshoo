@@ -21,6 +21,7 @@ class customer extends StatefulWidget {
 
 class _customerState extends State<customer> {
   String retID="qCvJAHc3th4ZgQzoatQ1";                     //here the id should be sent to
+  String url;
   crudMethods crudObj=new crudMethods();
   QuerySnapshot items;
   String transactionId;
@@ -31,10 +32,10 @@ class _customerState extends State<customer> {
         children: <Widget>[
           Expanded(
             flex: 7,
-            child: Image(
-              image: AssetImage('images/chinese-new-year-food-feast.jpg'),
+            child: CircleAvatar(
+              child: Text(Item.data['store_name'][0]),
+            )
             ),
-          ),
           SizedBox(width: 10),
           Expanded(
               flex: 11,
