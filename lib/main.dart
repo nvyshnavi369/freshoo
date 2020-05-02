@@ -5,6 +5,8 @@ import 'package:flutter/rendering.dart';
 import 'package:flutterapp/crud.dart';
 import 'items.dart';
 import 'additems.dart';
+import 'cart.dart';                                       //ADD these
+import 'history.dart';                                    //ADD these
 
 void main() => runApp(MaterialApp(
   initialRoute: '/',
@@ -12,6 +14,8 @@ void main() => runApp(MaterialApp(
     '/':(context) =>customer(),
     '/items':(context) =>items(),
     '/additems':(context) =>additems(),
+    '/cart':(context)=>cart(),                             //ADD these in routes
+    '/history':(context)=>history()                       //ADD these
   },
 ));
 class customer extends StatefulWidget {
@@ -20,7 +24,7 @@ class customer extends StatefulWidget {
 }
 
 class _customerState extends State<customer> {
-  String retID="qCvJAHc3th4ZgQzoatQ1";                     //here the id should be sent to
+  String retID="qCvJAHc3th4ZgQzoatQ1";
   String url;
   crudMethods crudObj=new crudMethods();
   QuerySnapshot items;
@@ -124,7 +128,10 @@ class _customerState extends State<customer> {
         ),
         floatingActionButton:FloatingActionButton.extended(
           onPressed: (){
-            Navigator.pushNamed(context,'/items',arguments: retID);
+            var custID='TaWSBn6nvsA5U5gX2odD';
+            var shopName='fresh';
+            var shopID='yGDtgovyEu0ZA9CDzAb4';
+            Navigator.pushNamed(context,'/cart',arguments: [custID,shopName,shopID]);                       //send cust id,shop name in this way (from submit button)
           },
           label: Text('Items'),
         ) ,

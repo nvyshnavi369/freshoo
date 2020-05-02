@@ -34,6 +34,37 @@ class crudMethods{
   }
 
 
+
+  Future<void>addHistory(id,data) async{
+    for(var i=0;i<data.length;i=i+1) {
+      Firestore.instance.collection('History').document(id).collection('items').add(data[i])
+          .catchError((e) {
+        print(e);
+      });
+    }
+  }
+  getHistory(id) async{
+    return await Firestore.instance.collection('History').document(id).collection('items').getDocuments();
+  }
+
+
+  emptyCart(id,data) async{
+    for(var i=0;i<data.length;i=i+1) {
+      return await Firestore.instance.collection('Customer').document(id)
+          .collection('cart').getDocuments().then((snapshot){
+            for(DocumentSnapshot ds in snapshot.documents){
+              ds.reference.delete();
+            }
+      }).catchError((e) {
+        print(e);
+      });
+    }
+  }
+
+  getCart(id) async{
+    return await Firestore.instance.collection('Customer').document(id).collection('cart').getDocuments();
+  }
+
   getRetailerItems(id) async{
     return await Firestore.instance.collection('Retailer').document(id).collection('items').getDocuments();
   }
@@ -97,4 +128,19 @@ class crudMethods{
        print(e);
      });
   }
+
+  Future<void>updateShop(shopid,a) async{
+    for(var i=0;i<a.length;i=i+1) {
+      Firestore.instance.collection('shop').document(shopid).collection('item1')
+          .where('item_name', isEqualTo: a[i]['name']).getDocuments()
+          .then((result) {
+        result.documents.forEach((result) {
+          var z=double.parse(result.data['item_quantity']);
+          z=z-double.parse(a[i]['quantity']);
+          result.reference.setData({'item_quantity':z.toString()},merge: true);
+        });
+      });
+    }
+  }
+
 }
